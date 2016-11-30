@@ -141,8 +141,6 @@ appHelper.addLocationHash = function (field, value)
     var hash = location.hash.toString().replace('#', '').split('|');
 
     var newHash = [];
-
-    console.log(hash);
     
     for (var key in hash)
     {

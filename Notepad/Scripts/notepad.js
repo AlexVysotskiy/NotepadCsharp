@@ -178,7 +178,7 @@ var initNotepadApp = function (appParams) {
     });
 
     // hanlder for submiting form in modal window
-    mainModal.on('click', '.save', function () {
+    mainModal.on('click', '.save', function (event) {
 
         var form = mainModal.find('form');
 
@@ -228,7 +228,7 @@ var initNotepadApp = function (appParams) {
     };
 
     // show editing form in modal for entry
-    mainContainer.on('click', '.edit-entry', function () {
+    mainContainer.on('click', '.edit-entry', function (event) {
 
         event.preventDefault();
 
