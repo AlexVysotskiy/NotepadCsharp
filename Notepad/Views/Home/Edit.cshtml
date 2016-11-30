@@ -1,0 +1,5 @@
+﻿@* Edit form of enity *@
+@{
+    Layout = "~/Views/Home/NotepadEntryForm.cshtml";
+    ViewBag.ActionLink = Url.Action("Edit", "Home", new { id = ViewBag.Data.Id });
+}

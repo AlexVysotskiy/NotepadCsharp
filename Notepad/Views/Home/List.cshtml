@@ -1,0 +1,209 @@
+﻿@{
+    ViewBag.Title = "Notepad";
+    ViewBag.HeaderTitle = "Notepad";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*
+    Main template for notepad application.
+    Styles is contained in Style.css. JS plugins in notepad.js and notepad.appHelper.js 
+    This is single page app, all operations a process by AJAX requests.
+*@
+
+<div id="content-holder" class="col-sm-8 col-sm-offset-2 notepad">
+
+    @* Block for search form. Submit of this form is handled by event in notepad.js *@
+    <div id="search" class="row">
+            <div class="col-sm-12 input-group my-group">
+
+                <form id="search-form">
+
+                    @* Unput for search string *@
+                    <input type="text" class="form-control col-sm-6" name="search" placeholder="Искать">
+
+                    @* List of available fields with translations *@
+                    @{ List<string> fields = new List<string> { "Name", "Lastname", "PhoneNumber" }; }
+                    @{ List<string> fieldsTranslations = new List<string> { "Имя", "Фамилия", "Номер телефона" }; }
+
+                    <select class="selectpicker form-control col-sm-6" name="field">
+                        @for (int i = 0; i < fields.Count; i++)
+                        {
+                            <option value="@fields.ElementAt(i)">@fieldsTranslations.ElementAt(i)</option>
+                        }
+                    </select>
+
+                    @* Submit and reset button *@
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">Искать</button>
+                        <button class="btn btn-warning clear" type="submit">&times;</button>
+                    </span>
+                </form>
+            </div>
+            <!-- /input-group -->
+    </div>
+
+    @* Block with sorting options *@
+    <div id="thead" class="row notepad-entry">
+        <div class="input-group col-sm-1">
+        </div>
+        <div class="col-sm-2 Name">
+            <a id="Name" href="#" class="change-order">
+                Имя
+            </a>
+        </div>
+        <div class="col-sm-2 Lastname">
+            <a id="Lastname" href="#" class="change-order">
+                Фамилия
+            </a>
+        </div>
+        <div class="col-sm-2 BirthYear">
+            <a id="BirthYear" href="#" class="change-order">
+                Год
+            </a>
+        </div>
+        <div class="col-sm-4 PhoneNumber">
+            <a id="PhoneNumber" href="#" class="change-order">
+                Телефон
+            </a>
+        </div>
+        @* Return to default orderind (DESC by Id) *@
+        <div class="col-sm-1">
+            <a href="#" class="change-order remove">
+                <span class="glyphicon glyphicon-remove"></span>
+            </a>
+        </div>
+    </div>
+
+    @* Show all available list *@
+    <div id="list-holder">
+        @foreach (var item in ViewBag.Entries)
+        {
+            <div id="notepad-entry-@item.Id" class="row notepad-entry switch-bg" data-itemId="@item.Id">
+                <div class="input-group col-sm-1">
+                    <input type="checkbox" aria-label="" class="remove" value="@item.Id">
+                </div>
+                <div class="col-sm-2 Name">
+                    @item.Name
+                </div>
+                <div class="col-sm-2 Lastname">
+                    @item.Lastname
+                </div>
+                <div class="col-sm-2 BirthYear">
+                    @item.BirthYear
+                </div>
+                <div class="col-sm-4 PhoneNumber">
+                    @item.PhoneNumber
+                </div>
+                <div class="col-sm-1">
+                    <span class="glyphicon glyphicon-pencil edit-entry"></span>
+                    <!-- <span class="glyphicon glyphicon-floppy-disk save"></span> -->
+                </div>
+            </div>
+        }
+    </div>
+
+    @* Template for adding new entity rows (handled by js) *@
+    <div id="template-row" class="row notepad-entry switch-bg hidden">
+        <div class="input-group col-sm-1">
+            <input type="checkbox" aria-label="" class="remove" value="" />
+        </div>
+        <div class="col-sm-2 Name">
+        </div>
+        <div class="col-sm-2 Lastname">
+        </div>
+        <div class="col-sm-2 BirthYear">
+        </div>
+        <div class="col-sm-4 PhoneNumber">
+        </div>
+        <div class="col-sm-1">
+            <span class="glyphicon glyphicon-pencil edit-entry"></span>
+        </div>
+    </div>
+
+    @* Show load more button (hanlded by js) *@
+    @if (ViewBag.HasMore)
+    {
+        <div id="load-more" class="row notepad-entry switch-bg">
+
+            <a href="#" class="ajax-loader">
+                Загрузить еще <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                <!-- <span class="glyphicon glyphicon-refresh loader" aria-hidden="true"></span> -->
+            </a>
+
+            <input type="hidden" name="page-counter" value="0" />
+        </div>
+    }
+
+                @* Block with main actions (all handled by js, watch notapad.js).
+        Обновить - refresh page
+        Добавить - show form for adding new entry in modal window
+        Сохранить - save entities to storage
+        Удалить - remove selected entries
+                *@
+    <div id="action" class="notepad-entry text-right">
+
+        <div>
+            <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
+            <a href="javascript: location.reload();" type="button" class="btn btn-primary">Обновить</a>
+
+            <!-- Contextual button for informational alert messages -->
+            <a href="#" id="add-new" type="button" class="btn btn-info">Добавить</a>
+
+            <!-- Indicates a successful or positive action -->
+            <a href="#" id="save-all" class="btn btn-success">Сохранить</a>
+
+            <!-- Indicates a dangerous or potentially negative action -->
+            <a href="#" id="remove-entry" type="button" class="btn btn-danger" disabled="disabled" data-active="0">Удалить</a>
+        </div>
+
+        <div id="action-notice">
+
+        </div>
+
+    </div>
+</div>
+
+@*  Empty modal window *@
+<div class="modal fade" id="main-modal" tabindex="-1" role="dialog" aria-labelledby="">
+    <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title"></h4>
+            </div>
+
+            <div class="modal-body">
+            </div>
+
+            <div id="modal-errors" class="alert alert-danger hidden"></div>
+
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+@*  Init js handlers for applications *@
+    <script type="text/javascript">
+        $(function () {
+
+            @*  Init params - main action urls *@
+            var appParams = {
+                listUrl: '@Url.Action("AjaxList", "Home")',
+                removeUrl: '@Url.Action("AjaxRemove", "Home")',
+                createUrl: '@Url.Action("Create", "Home")',
+                editUrl: '@Url.Action("Edit", "Home")',
+                saveUrl: '@Url.Action("Save", "Home")',
+                entryList: JSON.parse('@Html.Raw(Json.Encode(ViewBag.Entries))'),
+                viewCount: 3
+            };
+
+            initNotepadApp(appParams);
+        });
+    </script>
+}

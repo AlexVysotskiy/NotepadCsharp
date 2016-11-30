@@ -1,0 +1,38 @@
+﻿@* Partial template of common form for edit/create entries *@
+@{Layout = null;}
+@{ bool HasData = ViewBag.Data != null ; }
+<form id="create-form" class="form-horizontal" method="post" action="@ViewBag.ActionLink">
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">Имя:</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="Name" name="Name" value="@( HasData ? ViewBag.Data.Name : "")">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="lastname" class="col-sm-3 control-label ">Фамилия:</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="Lastname" name="Lastname" value="@(HasData ? ViewBag.Data.Lastname : "")">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">Год рождения:</label>
+        <div class="col-sm-9">
+            <select name="BirthYear" class="form-control">
+
+                @{ int selected = HasData ? ViewBag.Data.BirthYear : ViewBag.Today.Year - 25; }
+
+                @for (int i = 1900; i <= ViewBag.Today.Year; i++) {
+                    <option id="@i" value="@i" @(i == selected ? "selected=\"selected\"" : "") >@i</option>
+                }
+            </select>            
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="phoneNumber" class="col-sm-3 control-label">Номер телефона:</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@(HasData ? ViewBag.Data.PhoneNumber : "")">
+        </div>
+    </div>
+
+</form>
+@RenderBody()
