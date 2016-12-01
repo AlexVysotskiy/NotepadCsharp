@@ -1,7 +1,7 @@
 # C# Notepad test application
 
 Notepad app is singlepage application for managing your contacts.
-  - Make all operations withour page refresh
+  - Make all operations without page refresh
   - Access to observing result by URL
   - XML-file as storage
 
